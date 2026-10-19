@@ -28,7 +28,7 @@ python3 scripts/check_docs.py
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 ```
 
-Python 3.12+ and Go 1.23+ are CI validation tools, not app dependencies; source fetching and its regression tests require safe tar extraction filters. The hosted Mac contract lane selects Python 3.12.12 explicitly. An installed actionlint 1.7.7 binary can replace the Go command. The workflow lists Ubuntu build dependencies. `bash scripts/ci_build_linux.sh /new/work/path` repeats the diagnostic recipe on Ubuntu; it installs only into that work path. Do not run it as root or reuse VM paths. The macOS-only empty-HVF probe may be run manually on physical hardware using the [developer instructions](developer-boot.md), never by this workflow.
+Python 3.12+ and Go 1.23+ are CI validation tools, not app dependencies; source fetching and its regression tests require safe tar extraction filters. The hosted Mac contract lane selects Python 3.14.8 explicitly (a current patch with a published GitHub ARM64 toolchain build). An installed actionlint 1.7.7 binary can replace the Go command. The workflow lists Ubuntu build dependencies. `bash scripts/ci_build_linux.sh /new/work/path` repeats the diagnostic recipe on Ubuntu; it installs only into that work path. Do not run it as root or reuse VM paths. The macOS-only empty-HVF probe may be run manually on physical hardware using the [developer instructions](developer-boot.md), never by this workflow.
 
 ## Artifact boundary
 

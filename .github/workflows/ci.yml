@@ -84,7 +84,7 @@ jobs:
       - name: Select Python with safe archive filters for contract tests
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.12.12'
+          python-version: '3.14.8'
 
       - name: Cross-compile and inspect, never execute or sign
         run: |
