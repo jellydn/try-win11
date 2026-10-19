@@ -57,9 +57,9 @@ jobs:
             build-essential autoconf automake libtool pkg-config ninja-build \
             python3-venv python3-pip python3-setuptools python3-wheel \
             libglib2.0-dev libpixman-1-dev libslirp-dev libssl-dev libjson-glib-dev \
-            libtasn1-6-dev libgmp-dev expect gawk socat
+            libtasn1-6-dev libgmp-dev libfdt-dev expect gawk socat
           dpkg-query -W build-essential autoconf automake libtool ninja-build \
-            libglib2.0-dev libpixman-1-dev libslirp-dev libssl-dev libjson-glib-dev
+            libglib2.0-dev libpixman-1-dev libslirp-dev libssl-dev libjson-glib-dev libfdt-dev
           python3 --version
           cc --version
 
