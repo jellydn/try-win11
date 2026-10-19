@@ -1,0 +1,7 @@
+__pycache__/
+*.qcow2
+*.iso
+*.wim
+*.fd
+*.trywin11/
+inputs.local.json

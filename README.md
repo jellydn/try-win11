@@ -2,13 +2,15 @@
 
 Try Win11 is a proposed open-source native macOS app that helps Apple Silicon Mac users install and run Windows 11 ARM with minimal host setup.
 
-**Status: planning only.** There is no app, build, tested VM recipe, or release yet. No Windows boot was performed for this proposal. The planning environment is a Linux orb, not an M-series Mac.
+**Status: M1 developer prototype; boot gate blocked.** Read-only ISO and host checks now run on a physical M2 Pro Mac. A candidate QEMU + HVF launcher and state-safety tests exist, but no Windows boot, known-good runtime recipe, app or release is established. The host lacks the plan's required free storage; media provenance and runtime/firmware/driver pins remain open.
 
 ## Start here
 
 - [Implementation plan](docs/implementation-plan.md): scope, phased tasks, dependencies, risks, acceptance criteria, and go/no-go gates.
 - [Assumption validation and sources](docs/assumptions.md): what primary documentation supports and what still needs a hardware test.
 - [First milestone: reproducible boot](docs/boot-milestone.md): the work order and evidence needed before full UI development.
+- [Developer prototype](docs/developer-boot.md): read-only preflight, candidate launch commands and coupled-state safeguards.
+- [Mac preflight report](docs/reports/2026-10-19-mac-preflight.md): observed evidence, blockers and open gates.
 - [Architecture decisions](docs/adr/0001-runtime-and-process-boundary.md): proposed runtime, security state, and distribution decisions.
 - [Contributing](CONTRIBUTING.md): how to turn this plan into reviewed work.
 - [Project terms and constraints](CONTEXT.md).

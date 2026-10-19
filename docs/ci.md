@@ -2,18 +2,19 @@
 
 ## Current checks
 
-[CI](../.github/workflows/ci.yml) runs on pull requests, pushes to `main`, and manual dispatch. One Linux job checks text hygiene, inline relative Markdown file links, and GitHub Actions syntax with actionlint 1.7.7. It has read-only permissions, no secrets, no publication steps, a ten-minute timeout, and cancellation of obsolete runs for the same PR/ref. Checkout is pinned to an immutable revision and does not retain credentials.
+[CI](../.github/workflows/ci.yml) runs on pull requests, pushes to `main`, and manual dispatch. One Linux job checks the developer recipe contracts, text hygiene, inline relative Markdown file links, and GitHub Actions syntax with actionlint 1.7.7. It has read-only permissions, no secrets, no publication steps, a ten-minute timeout, and cancellation of obsolete runs for the same PR/ref. Checkout is pinned to an immutable revision and does not retain credentials.
 
-The repository currently uses an Amp-hosted Git remote. GitHub Actions will execute only when these files are pushed to a GitHub repository with Actions enabled. A push to the Amp remote is not a hosted Actions run; run the checks locally until a GitHub remote or mirror is configured.
+The GitHub repository is `jellydn/try-win11`. Only a real Actions run for the pushed commit is hosted-CI evidence; local checks and an Amp remote push are not substitutes. The recipe tests use synthetic media, subprocesses and local sockets, not Windows or QEMU. Hardware gates remain separate.
 
 Run the same checks locally from the repository root:
 
 ```bash
+python3 -m unittest discover -s tests -v
 python3 scripts/check_docs.py
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 ```
 
-Python 3.9+ and Go 1.23+ are validation tools, not app dependencies. An installed actionlint 1.7.7 binary can replace the Go command. The Linux runner supplies Python and Go; no package manifest or app toolchain is needed yet.
+Python 3.10+ and Go 1.23+ are validation tools, not app dependencies. An installed actionlint 1.7.7 binary can replace the Go command. The Linux runner supplies Python and Go; no package manifest or app toolchain is needed yet. The macOS-only empty-HVF probe is run manually on physical hardware using the [developer instructions](developer-boot.md), not in hosted CI.
 
 The documentation check covers Markdown, workflow YAML, Python scripts and LICENSE whitespace/newlines/conflict markers. It checks inline relative file links outside fenced examples, including fragment-bearing paths, but does not validate heading fragments, reference-style links or external websites. actionlint validates workflow semantics and embedded shell when ShellCheck is available. Neither check proves Windows boot, HVF access, or macOS signing.
 

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "machine": "UNRESOLVED",
+  "windows_use_confirmed": false,
+  "secure_boot_keys_reviewed": false,
+  "firmware_flash_bytes": 67108864,
+  "iso": {
+    "path": "/absolute/path/to/Windows11_ARM64.iso",
+    "sha256": null,
+    "publisher_hash_source": "",
+    "source": "https://www.microsoft.com/en-us/software-download/windows11arm64",
+    "revision": "UNRESOLVED",
+    "license": "User-supplied Windows; confirm permitted use separately"
+  },
+  "qemu": {
+    "path": "/absolute/path/to/qemu-system-aarch64",
+    "sha256": null,
+    "source": "https://gitlab.com/qemu-project/qemu",
+    "revision": "",
+    "license": ""
+  },
+  "qemu_img": {
+    "path": "/absolute/path/to/qemu-img",
+    "sha256": null,
+    "source": "https://gitlab.com/qemu-project/qemu",
+    "revision": "",
+    "license": ""
+  },
+  "swtpm": {
+    "path": "/absolute/path/to/swtpm",
+    "sha256": null,
+    "source": "https://github.com/stefanberger/swtpm",
+    "revision": "",
+    "license": ""
+  },
+  "firmware_code": {
+    "path": "/absolute/path/to/aarch64-code.fd",
+    "sha256": null,
+    "source": "https://github.com/tianocore/edk2",
+    "revision": "",
+    "license": ""
+  },
+  "firmware_vars": {
+    "path": "/absolute/path/to/enrolled-vars-template.fd",
+    "sha256": null,
+    "source": "https://github.com/tianocore/edk2",
+    "revision": "",
+    "license": ""
+  }
+}

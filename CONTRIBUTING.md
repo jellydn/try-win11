@@ -1,6 +1,6 @@
 # Contributing
 
-This repository contains a proposal only. Do not start the full UI before the boot and packaged-runtime gates pass.
+This repository contains the proposal and an M1 developer prototype. Do not start the full UI before the boot and packaged-runtime gates pass.
 
 1. Read [CONTEXT.md](CONTEXT.md), the [plan](docs/implementation-plan.md), and the relevant proposed ADR.
 2. Original contributions use the [MIT license](LICENSE). Preserve third-party notices and terms. The maintainer names gate owners before implementation begins.
@@ -11,7 +11,7 @@ This repository contains a proposal only. Do not start the full UI before the bo
 
 ## Testing and reports
 
-There are no product tests or build commands yet. Run `python3 scripts/check_docs.py` and actionlint as described in [CI checks](docs/ci.md) before submitting changes. Do not add a passing placeholder app build. Use the [boot work order](docs/boot-milestone.md) for the first hardware tests. The plan defines later test layers.
+Run `python3 -m unittest discover -s tests -v`, `python3 scripts/check_docs.py` and actionlint as described in [CI checks](docs/ci.md) before submitting changes. The [developer prototype](docs/developer-boot.md) is not a tested Windows recipe. Do not add a passing placeholder app build. Use the [boot work order](docs/boot-milestone.md) for hardware tests. The plan defines later test layers.
 
 A useful VM failure report includes Mac model/chip, RAM, macOS build, Windows build/edition, runtime manifest ID, last successful step, expected and actual results, and sanitized logs. Remove account names, paths with personal data, tokens, keys, guest files, and TPM state. Never upload a Windows ISO or installed Windows disk with a public issue.
 

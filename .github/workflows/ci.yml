@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Documentation and workflows
+    name: Recipe tests, documentation and workflows
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Check documentation
         run: python3 scripts/check_docs.py
+
+      - name: Test developer recipe contracts (not Windows boot)
+        run: python3 -m unittest discover -s tests -v
 
       - name: Check GitHub Actions workflows
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
