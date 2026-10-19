@@ -30,5 +30,101 @@ jobs:
       - name: Test developer recipe contracts (not Windows boot)
         run: python3 -m unittest discover -s tests -v
 
+      - name: Validate immutable diagnostic source pins
+        run: python3 scripts/ci_sources.py
+
+      - name: Check Python compilation
+        run: python3 -m compileall -q scripts tests
+
       - name: Check GitHub Actions workflows
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+
+  linux-build:
+    name: Pinned source build (Linux diagnostic only)
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install hosted build tools (not a hermetic toolchain)
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential autoconf automake libtool pkg-config ninja-build \
+            python3-venv python3-pip python3-setuptools python3-wheel \
+            libglib2.0-dev libpixman-1-dev libslirp-dev libssl-dev libjson-glib-dev \
+            libtasn1-6-dev libgmp-dev expect gawk socat
+          dpkg-query -W build-essential autoconf automake libtool ninja-build \
+            libglib2.0-dev libpixman-1-dev libslirp-dev libssl-dev libjson-glib-dev
+          python3 --version
+          cc --version
+
+      - name: Fetch, checksum, build and inventory without a guest
+        run: bash scripts/ci_build_linux.sh "$RUNNER_TEMP/linux-diagnostic"
+
+      - name: Record scope
+        run: |
+          echo 'Linux source compile/device inventory passed. No HVF, Windows, firmware, TPM persistence or licensing gate executed.' >> "$GITHUB_STEP_SUMMARY"
+
+  mac-build:
+    name: ARM64 host probe compile only (no HVF execution)
+    needs: validate
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Cross-compile and inspect, never execute or sign
+        run: |
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
+          xcrun clang -arch arm64 -mmacosx-version-min=14.0 \
+            -Wall -Wextra -Werror -framework Hypervisor \
+            scripts/hvf_probe.c -o "$RUNNER_TEMP/hvf-probe"
+          lipo -verify_arch arm64 "$RUNNER_TEMP/hvf-probe"
+          otool -L "$RUNNER_TEMP/hvf-probe"
+          plutil -lint config/hvf.entitlements.plist
+          echo 'ARM64 probe compiled/linked only. No guest CPU, HVF call, signing or physical-Mac gate executed.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Test portable recipe contracts on macOS (no media or HVF)
+        run: python3 -m unittest discover -s tests -v
+
+  source-package:
+    name: Original-source package safety and reproducibility
+    needs: [validate, linux-build, mac-build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Build twice, compare, verify and test extracted source
+        run: |
+          python3 scripts/ci_package.py "$RUNNER_TEMP/package-one"
+          python3 scripts/ci_package.py "$RUNNER_TEMP/package-two"
+          cmp "$RUNNER_TEMP/package-one/try-win11-source.tar" "$RUNNER_TEMP/package-two/try-win11-source.tar"
+          (cd "$RUNNER_TEMP/package-one" && sha256sum -c try-win11-source.tar.sha256)
+          mkdir "$RUNNER_TEMP/extracted"
+          tar -xf "$RUNNER_TEMP/package-one/try-win11-source.tar" -C "$RUNNER_TEMP/extracted"
+          (cd "$RUNNER_TEMP/extracted" && python3 -m unittest discover -s tests -v)
+
+      - name: Upload only original source and its inventory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: original-source-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/package-one/try-win11-source.tar
+            ${{ runner.temp }}/package-one/try-win11-source.tar.sha256
+            ${{ runner.temp }}/package-one/source-inventory.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0

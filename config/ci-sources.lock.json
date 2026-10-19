@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "profile": "linux-diagnostic-only",
+  "sources": {
+    "qemu": {
+      "version": "11.1.2",
+      "revision": "qemu-11.1.2",
+      "url": "https://download.qemu.org/qemu-11.1.2.tar.xz",
+      "sha256": "731b5681e4bb18be313231579b8efd0296c5b015fa36dc533874b639ba838016",
+      "root": "qemu-11.1.2",
+      "license": "GPL-2.0 with component-specific licenses; see COPYING and LICENSE",
+      "configure": ["--target-list=aarch64-softmmu", "--disable-default-features", "--enable-tcg", "--enable-tpm", "--enable-slirp", "--enable-tools", "--disable-docs", "--disable-guest-agent", "--disable-download", "--disable-install-blobs"]
+    },
+    "libtpms": {
+      "version": "0.10.2",
+      "revision": "03ff2481e133540be3b3ffe3daa1483d2a73d967",
+      "url": "https://codeload.github.com/stefanberger/libtpms/tar.gz/03ff2481e133540be3b3ffe3daa1483d2a73d967",
+      "sha256": "bf3e3c9c1eb66bf76f7e25b7eecc186915554c0f4aa072c8751477bba539c3a6",
+      "root": "libtpms-03ff2481e133540be3b3ffe3daa1483d2a73d967",
+      "license": "BSD-style; see LICENSE and component notices",
+      "configure": ["--with-tpm2", "--disable-static"]
+    },
+    "swtpm": {
+      "version": "0.10.2",
+      "revision": "32b5a0575991a73398de9749d63cafd847008af2",
+      "url": "https://codeload.github.com/stefanberger/swtpm/tar.gz/32b5a0575991a73398de9749d63cafd847008af2",
+      "sha256": "82cdf883da5f91fdd4f56b703693541b3e7051e1ae9f2a028fa17ec7c55a883a",
+      "root": "swtpm-32b5a0575991a73398de9749d63cafd847008af2",
+      "license": "BSD-3-Clause; see LICENSE and component notices",
+      "configure": ["--with-openssl", "--without-gnutls", "--without-cuse", "--without-selinux", "--without-seccomp", "--disable-tests"]
+    }
+  }
+}

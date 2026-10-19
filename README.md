@@ -14,7 +14,7 @@ Try Win11 is a proposed open-source native macOS app that helps Apple Silicon Ma
 - [Architecture decisions](docs/adr/0001-runtime-and-process-boundary.md): proposed runtime, security state, and distribution decisions.
 - [Contributing](CONTRIBUTING.md): how to turn this plan into reviewed work.
 - [Project terms and constraints](CONTEXT.md).
-- [CI checks](docs/ci.md): documentation validation now and macOS checks when app targets exist.
+- [CI checks](docs/ci.md): source pins, diagnostic builds, contract tests and safe source-only artifacts; no hardware gate passes.
 
 ## Proposed direction
 
