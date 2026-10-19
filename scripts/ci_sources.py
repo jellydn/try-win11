@@ -55,6 +55,21 @@ def verify(path, expected):
         raise ValueError(f"Source hash mismatch: {path.name}")
 
 
+def extract(archive, destination, item, name):
+    with tarfile.open(archive) as source:
+        members = []
+        for member in source.getmembers():
+            parts = member.name.split("/")
+            if parts[0] != item["root"]:
+                raise ValueError(f"Unexpected source root: {name}")
+            # No firmware build: omit QEMU's independent ROM source trees, including
+            # EDK II's absolute host-X11 symlink. Never relax the data filter.
+            if name == "qemu" and len(parts) > 1 and parts[1] == "roms":
+                continue
+            members.append(member)
+        source.extractall(destination, members=members, filter="data")
+
+
 def fetch(lock, destination):
     # Exclusive directory: do not reuse unchecked cache entries or replace source trees.
     destination.mkdir(mode=0o700)
@@ -71,11 +86,7 @@ def fetch(lock, destination):
                 output.write(block)
         verify(archive, item["sha256"])
         # Python 3.12+ data filter rejects absolute/escaping links and device nodes.
-        with tarfile.open(archive) as source:
-            for member in source.getmembers():
-                if member.name.split("/")[0] != item["root"]:
-                    raise ValueError(f"Unexpected source root: {name}")
-            source.extractall(destination, filter="data")
+        extract(archive, destination, item, name)
         print(f"VERIFIED {name} {item['revision']} {item['sha256']}", flush=True)
 
 

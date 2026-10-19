@@ -81,6 +81,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Select Python with safe archive filters for contract tests
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12.12'
+
       - name: Cross-compile and inspect, never execute or sign
         run: |
           xcodebuild -version
@@ -88,7 +93,7 @@ jobs:
           xcrun clang -arch arm64 -mmacosx-version-min=14.0 \
             -Wall -Wextra -Werror -framework Hypervisor \
             scripts/hvf_probe.c -o "$RUNNER_TEMP/hvf-probe"
-          lipo -verify_arch arm64 "$RUNNER_TEMP/hvf-probe"
+          lipo "$RUNNER_TEMP/hvf-probe" -verify_arch arm64
           otool -L "$RUNNER_TEMP/hvf-probe"
           plutil -lint config/hvf.entitlements.plist
           echo 'ARM64 probe compiled/linked only. No guest CPU, HVF call, signing or physical-Mac gate executed.' >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,7 @@
 """Hosted-CI contracts; no VM fixtures, firmware, Microsoft media or network."""
 
 import copy
+import io
 import json
 from pathlib import Path
 import sys
@@ -37,6 +38,31 @@ class CITests(unittest.TestCase):
             archive.write_bytes(b"abd")
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 ci_sources.verify(archive, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+
+    def test_source_extraction_omits_unbuilt_roms_but_rejects_other_absolute_links(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / "source.tar"
+            for link_path, accepted in (("qemu-test/roms/edk2/X11IncludeHack", True),
+                                        ("qemu-test/src/unsafe", False)):
+                with tarfile.open(archive, "w") as output:
+                    regular = tarfile.TarInfo("qemu-test/configure")
+                    regular.size = 2
+                    output.addfile(regular, io.BytesIO(b"ok"))
+                    link = tarfile.TarInfo(link_path)
+                    link.type = tarfile.SYMTYPE
+                    link.linkname = "/usr/include/X11"
+                    output.addfile(link)
+                destination = root / ("accepted" if accepted else "rejected")
+                destination.mkdir()
+                if accepted:
+                    ci_sources.extract(archive, destination, {"root": "qemu-test"}, "qemu")
+                    self.assertEqual((destination / "qemu-test/configure").read_bytes(), b"ok")
+                    self.assertFalse((destination / "qemu-test/roms").exists())
+                else:
+                    with self.assertRaises(tarfile.AbsoluteLinkError):
+                        ci_sources.extract(archive, destination, {"root": "qemu-test"}, "qemu")
+                    self.assertFalse((destination / link_path).exists())
 
     def test_package_is_deterministic_and_excludes_unlisted_state(self):
         with tempfile.TemporaryDirectory() as directory:
