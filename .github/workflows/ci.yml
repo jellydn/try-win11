@@ -16,7 +16,7 @@ concurrency:
 jobs:
   validate:
     name: Recipe tests, documentation and workflows
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -42,7 +42,7 @@ jobs:
   linux-build:
     name: Pinned source build (Linux diagnostic only)
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 35
     steps:
       - name: Checkout
@@ -104,7 +104,7 @@ jobs:
   source-package:
     name: Original-source package safety and reproducibility
     needs: [validate, linux-build, mac-build]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Checkout
