@@ -47,7 +47,7 @@ jobs:
     name: Recipe tests, documentation and workflows
     # Standard hosted runners are free for public repositories. Fail closed if private.
     if: github.event.repository.private == false
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -74,7 +74,7 @@ jobs:
     name: Pinned source build (Linux diagnostic only)
     if: github.event_name == 'workflow_dispatch' && inputs.linux_build
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 35
     steps:
       - name: Checkout
@@ -137,7 +137,7 @@ jobs:
   source-package:
     name: Original-source package safety and reproducibility
     needs: [validate]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Checkout
