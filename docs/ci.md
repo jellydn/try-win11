@@ -2,14 +2,18 @@
 
 ## Current checks
 
-[CI](../.github/workflows/ci.yml) runs on pull requests, pushes to `main`, and manual dispatch. All jobs use `contents: read`, no secrets, immutable action commits, checkout without persisted credentials, timeouts and per-ref concurrency cancellation. No deployment, release, signing submission, VM creation or guest execution is allowed.
+[CI](../.github/workflows/ci.yml) runs lightweight validation and source packaging on pull requests and pushes to `main` that change workflows, scripts, tests, config, docs, root Markdown, LICENSE, `.gitignore` or Renovate configuration. Other paths do not trigger a run. Linux source builds and Mac compilation run only through manual dispatch with their respective `linux_build` or `mac_build` input enabled; both default to false. This avoids repeated dependency builds and Mac jobs on routine changes. Manual dispatch always runs validation and source packaging.
+
+The repository is public. Only standard GitHub-hosted `ubuntu-24.04` and `macos-15` runners are used; there is no self-hosted Mac lane or larger paid runner. Validation refuses to start if the event identifies the repository as private; all other jobs depend on validation. Do not remove this guard without reviewing free allowances and billing. No paid services, secrets or billing changes are required. Source artifacts expire after one day to limit storage. Review GitHub billing if visibility or runner policy changes; workflow settings are not an account-level spending cap.
+
+All jobs use `contents: read`, no secrets, immutable action commits, checkout without persisted credentials, timeouts and per-ref concurrency cancellation. No deployment, release, signing submission, VM creation or guest execution is allowed.
 
 | Job | Hosted evidence only |
 | --- | --- |
 | Validate (Ubuntu 24.04) | Contract tests, Python compilation, documentation and actionlint 1.7.7; fail-closed source-pin checks. |
-| Linux diagnostic source build | Fetch/checksum QEMU, libtpms and swtpm; build ARM-system device emulation for a Linux host, run libtpms upstream tests, inspect TPM2 capabilities and QEMU devices. No guest is launched. |
-| ARM64 Mac probe compile (macOS 15) | Compile/link the existing C probe for ARM64/macOS 14, inspect architecture/load commands and entitlement XML, run portable contract tests. Never execute or sign the probe. |
-| Original-source package | After all other jobs pass, build twice and compare bytes; check checksum; extract and rerun contract tests; upload only allowlisted original source, SHA-256 and inventory. Seven-day retention. |
+| Linux diagnostic source build (manual opt-in) | Fetch/checksum QEMU, libtpms and swtpm; build ARM-system device emulation for a Linux host, run libtpms upstream tests, inspect TPM2 capabilities and QEMU devices. No guest is launched. |
+| ARM64 Mac probe compile (macOS 15, manual opt-in) | Compile/link the existing C probe for ARM64/macOS 14, inspect architecture/load commands and entitlement XML, run portable contract tests. Never execute or sign the probe. |
+| Original-source package | After validation passes, build twice and compare bytes; check checksum; extract and rerun contract tests; upload only allowlisted original source, SHA-256 and inventory. One-day retention. This is independent of optional diagnostic builds, not evidence that those builds passed. |
 
 The [source lock](../config/ci-sources.lock.json) pins QEMU 11.1.2 by release archive SHA-256 and swtpm/libtpms 0.10.2 by full source commits plus archive SHA-256. Configure flags are versioned in the same lock. Downloads must match before extraction; extraction uses Python's data filter, checked root paths and a new directory. QEMU's unbuilt `roms/` firmware-source tree is omitted (it contains an absolute EDK II host-X11 link); the data filter remains mandatory for every retained member. Sources over 256 MiB are rejected. QEMU configure downloads and firmware installation are disabled. SHA-256 establishes repeatable bytes from reviewed HTTPS sources, not signature verification or a security/licensing approval.
 

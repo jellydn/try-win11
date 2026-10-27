@@ -2,9 +2,38 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'renovate.json'
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'renovate.json'
   workflow_dispatch:
+    inputs:
+      linux_build:
+        description: Build pinned Linux diagnostic sources (no guest)
+        type: boolean
+        default: false
+      mac_build:
+        description: Compile ARM64 probe on hosted macOS (no HVF execution)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -16,6 +45,8 @@ concurrency:
 jobs:
   validate:
     name: Recipe tests, documentation and workflows
+    # Standard hosted runners are free for public repositories. Fail closed if private.
+    if: github.event.repository.private == false
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -41,6 +72,7 @@ jobs:
 
   linux-build:
     name: Pinned source build (Linux diagnostic only)
+    if: github.event_name == 'workflow_dispatch' && inputs.linux_build
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -72,6 +104,7 @@ jobs:
 
   mac-build:
     name: ARM64 host probe compile only (no HVF execution)
+    if: github.event_name == 'workflow_dispatch' && inputs.mac_build
     needs: validate
     runs-on: macos-15
     timeout-minutes: 10
@@ -103,7 +136,7 @@ jobs:
 
   source-package:
     name: Original-source package safety and reproducibility
-    needs: [validate, linux-build, mac-build]
+    needs: [validate]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -131,5 +164,5 @@ jobs:
             ${{ runner.temp }}/package-one/try-win11-source.tar.sha256
             ${{ runner.temp }}/package-one/source-inventory.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
           compression-level: 0
