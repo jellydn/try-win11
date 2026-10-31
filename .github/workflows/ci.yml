@@ -106,7 +106,7 @@ jobs:
     name: ARM64 host probe compile only (no HVF execution)
     if: github.event_name == 'workflow_dispatch' && inputs.mac_build
     needs: validate
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 10
     steps:
       - name: Checkout
